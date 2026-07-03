@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHITECTURE://MINDS</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#0A0F1C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg class="brand-mark" viewBox="0 0 24 24" width="22" height="22" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12,2 L20.66,7 L20.66,17 L12,22 L3.34,17 L3.34,7 Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+      <circle cx="12" cy="12" r="2.6" fill="currentColor"/>
+    </svg>
+    <span class="brand-text">ARCHITECTURE<span class="brand-accent">://</span>MINDS</span>
+  </div>
+  <div class="topbar-right">
+    <div class="topbar-sub">An AI Council for Human-Approved Infrastructure</div>
+    <div class="topbar-hm">Powered by Happiest Minds &middot; BLITZ 2026</div>
+  </div>
+</header>
+
+<div class="step-tracker" id="stepTracker">
+  <div class="step" data-step="1"><span class="step-num">1</span><span class="step-label">Describe</span></div>
+  <div class="step-line"></div>
+  <div class="step" data-step="2"><span class="step-num">2</span><span class="step-label">Architect proposes</span></div>
+  <div class="step-line"></div>
+  <div class="step" data-step="3"><span class="step-num">3</span><span class="step-label">Council reviews</span></div>
+  <div class="step-line"></div>
+  <div class="step" data-step="4"><span class="step-num">4</span><span class="step-label">You decide</span></div>
+</div>
+
+<main class="stage">
+
+  <section class="input-panel">
+    <div class="eyebrow">01 &mdash; Describe the system</div>
+    <h1>Say what you need. <span class="accent-ai">Watch it get architected.</span></h1>
+    <p class="lede">Speak or type a requirement in plain English. An AI agent proposes an AWS architecture and Terraform. A human &mdash; you &mdash; reviews before anything ships.</p>
+
+    <div class="input-row">
+      <textarea id="requirementInput" placeholder="e.g. I need to accept file uploads from users, process them asynchronously, and notify the user when done" rows="3"></textarea>
+      <div class="input-actions">
+        <button id="micBtn" class="btn btn-mic" title="Speak your requirement">
+          <span class="mic-icon">&#9679;</span> <span id="micLabel">Speak</span>
+        </button>
+        <button id="generateBtn" class="btn btn-primary">Generate Architecture &rarr;</button>
+      </div>
+    </div>
+
+    <div class="examples">
+      <span class="examples-label">Try:</span>
+      <button class="chip" data-example="Users upload photos, we resize them and store thumbnails, and notify the user by email when ready.">Async file processing</button>
+      <button class="chip" data-example="A REST API where authenticated users can create and fetch orders stored in a database.">Auth'd REST API</button>
+      <button class="chip" data-example="An event pipeline that ingests IoT sensor data, processes it in real time, and triggers alerts on anomalies.">Event-driven pipeline</button>
+    </div>
+
+    <div id="statusLine" class="status-line"></div>
+  </section>
+
+  <section class="result-panel" id="resultPanel" hidden>
+
+    <div class="eyebrow">02 &mdash; Proposed architecture <span class="tag-ai">AI-generated</span></div>
+    <p class="summary" id="summaryText"></p>
+
+    <div class="diagram-wrap">
+      <svg id="diagramSvg" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+
+    <div class="split">
+      <div class="col">
+        <div class="eyebrow eyebrow-sm">Terraform <span class="tag-ai">AI-generated</span></div>
+        <pre class="code-block" id="terraformBlock"></pre>
+      </div>
+      <div class="col">
+        <div class="eyebrow eyebrow-sm">AI notes</div>
+        <ul class="considerations" id="considerationsList"></ul>
+      </div>
+    </div>
+
+    <div class="council-loading" id="councilLoading" hidden>
+      <div class="council-loading-row">
+        <span class="council-dot dot-cost"></span> Cost Agent reviewing&hellip;
+        <span class="council-dot dot-security"></span> Security Agent reviewing&hellip;
+        <span class="council-dot dot-reliability"></span> Reliability Agent reviewing&hellip;
+      </div>
+    </div>
+
+    <div class="council-section" id="councilSection" hidden>
+      <div class="eyebrow council-eyebrow">03 &mdash; AI Architecture Council <span class="tag-ai">3 specialists, in parallel</span></div>
+      <p class="council-lede">Three independent AI specialists review the same proposal. Where they disagree is exactly where your judgment matters most.</p>
+      <div class="council-grid" id="councilGrid"></div>
+    </div>
+
+    <div class="decision-section" id="decisionSection" hidden>
+      <div class="eyebrow council-eyebrow" style="color: var(--human-accent);">04 &mdash; Your call <span class="tag-human">Human decides</span></div>
+      <p class="council-lede">You've seen the architect's proposal and the council's review. Approve to move forward, or send it back for revision.</p>
+      <div class="review-actions">
+        <button class="btn btn-approve" id="approveBtn">&check; Approve architecture</button>
+        <button class="btn btn-flag" id="flagBtn">&#9873; Flag for revision</button>
+        <button class="btn btn-refine" id="refineBtn" hidden>&#8635; Regenerate with Council feedback</button>
+      </div>
+      <div id="reviewNote" class="review-note" hidden></div>
+    </div>
+
+  </section>
+
+  <section class="error-panel" id="errorPanel" hidden>
+    <span class="error-icon">!</span>
+    <span id="errorText"></span>
+  </section>
+
+  <section class="how-it-works-section">
+    <div class="section-kicker">How it works</div>
+    <h2 class="section-heading">One requirement, three checks, one decision.</h2>
+    <svg viewBox="0 0 920 150" class="explainer-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <marker id="explainerArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" class="explainer-arrowhead"></path>
+        </marker>
+      </defs>
+      <line x1="150" y1="80" x2="270" y2="80" class="explainer-line" marker-end="url(#explainerArrow)"></line>
+      <line x1="420" y1="80" x2="540" y2="80" class="explainer-line" marker-end="url(#explainerArrow)"></line>
+      <line x1="690" y1="80" x2="770" y2="80" class="explainer-line" marker-end="url(#explainerArrow)"></line>
+
+      <g>
+        <rect x="10" y="40" width="140" height="80" rx="10" class="explainer-box box-human"></rect>
+        <text x="80" y="72" text-anchor="middle" class="explainer-title">You</text>
+        <text x="80" y="90" text-anchor="middle" class="explainer-sub">speak or type</text>
+        <text x="80" y="104" text-anchor="middle" class="explainer-sub">a requirement</text>
+      </g>
+
+      <g>
+        <rect x="270" y="30" width="150" height="100" rx="10" class="explainer-box box-ai"></rect>
+        <text x="345" y="62" text-anchor="middle" class="explainer-title">Architect</text>
+        <text x="345" y="80" text-anchor="middle" class="explainer-sub">proposes diagram</text>
+        <text x="345" y="94" text-anchor="middle" class="explainer-sub">+ Terraform</text>
+        <text x="345" y="112" text-anchor="middle" class="explainer-tag">AI agent</text>
+      </g>
+
+      <g>
+        <rect x="540" y="20" width="150" height="120" rx="10" class="explainer-box box-council"></rect>
+        <text x="615" y="50" text-anchor="middle" class="explainer-title">Council</text>
+        <text x="615" y="68" text-anchor="middle" class="explainer-sub">Cost &middot; Security &middot;</text>
+        <text x="615" y="82" text-anchor="middle" class="explainer-sub">Reliability</text>
+        <text x="615" y="98" text-anchor="middle" class="explainer-sub">review in parallel</text>
+        <text x="615" y="120" text-anchor="middle" class="explainer-tag">3 AI agents</text>
+      </g>
+
+      <g>
+        <rect x="770" y="40" width="140" height="80" rx="10" class="explainer-box box-human"></rect>
+        <text x="840" y="72" text-anchor="middle" class="explainer-title">You decide</text>
+        <text x="840" y="90" text-anchor="middle" class="explainer-sub">approve, flag,</text>
+        <text x="840" y="104" text-anchor="middle" class="explainer-sub">or refine</text>
+      </g>
+    </svg>
+  </section>
+
+  <section class="value-section">
+    <div class="section-kicker">Why this matters</div>
+    <h2 class="section-heading">Not a concept demo &mdash; a working accelerator, with the numbers behind it.</h2>
+    <div class="value-grid">
+      <div class="value-card">
+        <div class="value-icon value-icon-problem">&#9673;</div>
+        <div class="value-label">Problem</div>
+        <p class="value-text">Solution architects spend hours sketching a first-draft architecture after a client requirement call &mdash; before a proposal or SOW can even start. This gives them a reviewed candidate architecture, live, in the room.</p>
+      </div>
+      <div class="value-card">
+        <div class="value-icon value-icon-business">&#9670;</div>
+        <div class="value-label">Business value</div>
+        <p class="value-text">A pre-sales / solution-scoping accelerator: architects go from a client conversation to a diagram, Terraform draft, and independent cost/security/reliability review in minutes &mdash; a validated starting point for the actual proposal, not a replacement for it.</p>
+      </div>
+    </div>
+
+    <div class="metrics-strip">
+      <div class="metrics-strip-label">Impact <span class="metrics-caveat">(directional, from a manual baseline)</span></div>
+      <div class="metrics-strip-grid">
+        <div class="metric-tile">
+          <div class="metric-tile-num">~2&ndash;4 hrs &rarr; &lt;2 min</div>
+          <div class="metric-tile-desc">for a first-draft architecture + IaC sketch</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-tile-num">3 specialists, 1 pass</div>
+          <div class="metric-tile-desc">cost, security &amp; reliability reviewed in parallel, not sequentially</div>
+        </div>
+        <div class="metric-tile">
+          <div class="metric-tile-num">0 &rarr; live</div>
+          <div class="metric-tile-desc">client sees the architecture take shape in the conversation, not a follow-up deck</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stack-strip">
+      <span class="stack-strip-label">Tech stack</span>
+      <span class="stack-strip-value">Node.js &middot; AWS Lambda-ready &middot; Claude API &middot; Web Speech API &middot; Vanilla JS</span>
+    </div>
+  </section>
+
+  <section class="usecases-section">
+    <div class="section-kicker">Use cases</div>
+    <h2 class="section-heading">Where this fits into how Happiest Minds already works.</h2>
+    <div class="usecases-grid">
+      <div class="usecase-card" style="--uc-color: var(--ai-accent);">
+        <div class="usecase-title">Pre-sales solution scoping</div>
+        <p class="usecase-text">An architect sketches a candidate AWS architecture live during or right after a client discovery call, with cost/security/reliability sign-off, as a starting point for the SOW.</p>
+      </div>
+      <div class="usecase-card" style="--uc-color: var(--human-accent);">
+        <div class="usecase-title">Client co-design workshops</div>
+        <p class="usecase-text">Instead of presenting a finished deck, the architect designs the system with the client in the room &mdash; adjusting live as requirements shift mid-conversation.</p>
+      </div>
+      <div class="usecase-card" style="--uc-color: var(--reliability-color);">
+        <div class="usecase-title">Internal design review</div>
+        <p class="usecase-text">Before a design goes to a formal review board, engineers get a fast, independent second opinion on cost, security, and reliability trade-offs.</p>
+      </div>
+  </section>
+
+  <section class="roadmap-section">
+    <div class="section-kicker">What's next</div>
+    <h2 class="section-heading">This runs on AWS today. It's built to go further.</h2>
+    <p class="roadmap-lede">The Architect + Council pattern &mdash; propose, independently review, decide &mdash; isn't tied to one cloud or one kind of review. Here's where it's headed.</p>
+    <div class="roadmap-grid">
+      <div class="roadmap-card">
+        <div class="roadmap-head">
+          <span class="roadmap-title">Multi-cloud support</span>
+          <span class="roadmap-badge badge-next">Next up</span>
+        </div>
+        <p class="roadmap-text">Azure and GCP architectures, using the same Architect + Council pattern &mdash; so architects aren't locked into one cloud's playbook during client conversations.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-head">
+          <span class="roadmap-title">CI/CD pipeline integration</span>
+          <span class="roadmap-badge badge-next">Next up</span>
+        </div>
+        <p class="roadmap-text">Gate merges on Council risk scores, auto-attach AI-generated tests, and post the review straight onto the pull request &mdash; extending the same human-approval pattern into delivery.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-head">
+          <span class="roadmap-title">More specialists</span>
+          <span class="roadmap-badge badge-exploring">Exploring</span>
+        </div>
+        <p class="roadmap-text">A Compliance agent for regulated industries (BFSI, Healthcare) and a Performance agent for latency-sensitive systems &mdash; joining Cost, Security, and Reliability on the Council.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-head">
+          <span class="roadmap-title">Proposal export</span>
+          <span class="roadmap-badge badge-exploring">Exploring</span>
+        </div>
+        <p class="roadmap-text">One click to turn an approved architecture, its Terraform, and the Council's review into a client-ready proposal document &mdash; closing the loop from conversation to deliverable.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span class="footer-hm">Powered by Happiest Minds</span>
+  <span class="footer-divider">&middot;</span>
+  <span>Node.js &middot; AWS Lambda-ready architecture &middot; Claude API &middot; Human-in-the-loop by design</span>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
