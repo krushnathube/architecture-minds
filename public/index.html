@@ -70,6 +70,15 @@
     <div class="eyebrow">02 &mdash; Proposed architecture <span class="tag-ai">AI-generated</span></div>
     <p class="summary" id="summaryText"></p>
 
+    <div class="report-export-row report-export-row-top">
+      <button class="btn btn-export btn-download-report" id="downloadReportBtnTop">&#8681; Download Full Report (PDF)</button>
+      <span class="report-export-note">Requirement, diagram, Terraform, AI notes &amp; Council review &mdash; one file</span>
+    </div>
+
+    <div class="diagram-toolbar">
+      <span class="diagram-toolbar-label">Diagram</span>
+      <button class="btn btn-export" id="exportPngBtn">&#8681; Download as PNG</button>
+    </div>
     <div class="diagram-wrap">
       <svg id="diagramSvg" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid meet"></svg>
     </div>
@@ -102,6 +111,12 @@
     <div class="decision-section" id="decisionSection" hidden>
       <div class="eyebrow council-eyebrow" style="color: var(--human-accent);">04 &mdash; Your call <span class="tag-human">Human decides</span></div>
       <p class="council-lede">You've seen the architect's proposal and the council's review. Approve to move forward, or send it back for revision.</p>
+
+      <div class="report-export-row">
+        <button class="btn btn-export btn-download-report" id="downloadReportBtnBottom">&#8681; Download Full Report (PDF)</button>
+        <span class="report-export-note">Requirement, diagram, Terraform, AI notes &amp; Council review &mdash; one file</span>
+      </div>
+
       <div class="review-actions">
         <button class="btn btn-approve" id="approveBtn">&check; Approve architecture</button>
         <button class="btn btn-flag" id="flagBtn">&#9873; Flag for revision</button>
@@ -265,6 +280,7 @@
   <span>Node.js &middot; AWS Lambda-ready architecture &middot; Claude API &middot; Human-in-the-loop by design</span>
 </footer>
 
+<script src="vendor/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

@@ -141,7 +141,3 @@ engineering-level version for whoever picks this up after BLITZ:
 - **Proposal export** — turn an approved architecture + Terraform + Council review into a
   client-ready document (the `docx` or `pdf` generation pattern used for the poster could
   extend here).
-
-## Changelog
-
-- 2026-07-03: README updated with minor edits and clarifications.
