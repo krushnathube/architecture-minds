@@ -121,6 +121,38 @@ async function callClaude(systemPrompt, userContent, maxTokens) {
   return JSON.parse(cleaned);
 }
 
+// Same as callClaude, but returns plain text instead of JSON-parsing the response —
+// used for prose output like the client proposal's executive summary.
+async function callClaudeRaw(systemPrompt, userContent, maxTokens) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userContent }]
+    })
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    console.error('Anthropic API error:', response.status, errText);
+    throw new Error('ANTHROPIC_API_ERROR');
+  }
+
+  const data = await response.json();
+  const textBlock = data.content.find(b => b.type === 'text');
+  if (!textBlock) throw new Error('NO_TEXT_BLOCK');
+  if (data.stop_reason === 'max_tokens') throw new Error('MAX_TOKENS');
+
+  return textBlock.text.trim();
+}
+
 app.post('/api/architect', async (req, res) => {
   try {
     const { requirement } = req.body;
@@ -214,6 +246,42 @@ ${architecture.terraform || ''}`;
   } catch (err) {
     console.error('Server error:', err);
     return res.status(500).json({ error: 'Unexpected server error convening the council.' });
+  }
+});
+
+app.post('/api/proposal-summary', async (req, res) => {
+  try {
+    const { architecture } = req.body;
+
+    if (!architecture || !architecture.summary) {
+      return res.status(400).json({ error: 'A generated architecture is required first.' });
+    }
+    if (!ANTHROPIC_API_KEY) {
+      return res.status(500).json({ error: 'Server is missing ANTHROPIC_API_KEY. Set it in your environment variables.' });
+    }
+
+    const componentList = (architecture.nodes || []).map(n => n.label || n.type).join(', ');
+    const context = `Technical architecture summary: ${architecture.summary}\n\nComponents involved: ${componentList}`;
+
+    const systemPrompt = `You write short, client-facing executive summaries for solution proposals at an IT services company.
+Given a technical architecture summary, write 3-4 plain-English sentences explaining what is being proposed and the business benefit —
+avoid deep technical jargon (no resource names, no AWS service internals beyond what a business stakeholder would recognize).
+Respond with ONLY the summary text. No preamble, no headers, no markdown formatting.`;
+
+    let summary;
+    try {
+      summary = await callClaudeRaw(systemPrompt, context, 400);
+    } catch (e) {
+      if (e.message === 'MAX_TOKENS') {
+        return res.status(502).json({ error: 'The summary got cut off. Please try again.' });
+      }
+      return res.status(502).json({ error: 'The AI service returned an error. Please try again.' });
+    }
+
+    return res.json({ summary });
+  } catch (err) {
+    console.error('Server error:', err);
+    return res.status(500).json({ error: 'Unexpected server error.' });
   }
 });
 

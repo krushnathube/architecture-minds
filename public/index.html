@@ -108,6 +108,23 @@
       <div class="council-grid" id="councilGrid"></div>
     </div>
 
+    <div class="proposal-section" id="proposalSection" hidden>
+      <div class="eyebrow council-eyebrow">Client Proposal</div>
+      <p class="council-lede">A client-facing version of this architecture &mdash; cover page, plain-English summary, recommendations, and next steps. Terraform stays in a technical appendix.</p>
+
+      <label class="proposal-label" for="clientNameInput">Client name (optional)</label>
+      <input type="text" id="clientNameInput" class="proposal-input" placeholder="e.g. Acme Retail Corp">
+
+      <label class="proposal-label" for="proposalSummaryText">Executive summary <span class="proposal-hint">&mdash; edit freely, or polish with AI</span></label>
+      <textarea id="proposalSummaryText" class="proposal-summary-input" rows="4"></textarea>
+
+      <div class="proposal-actions">
+        <button class="btn btn-polish" id="polishSummaryBtn">&#10024; Polish with AI</button>
+        <button class="btn btn-export" id="generateProposalBtn">&#8681; Download Client Proposal (PDF)</button>
+      </div>
+      <div id="proposalStatus" class="status-line"></div>
+    </div>
+
     <div class="decision-section" id="decisionSection" hidden>
       <div class="eyebrow council-eyebrow" style="color: var(--human-accent);">04 &mdash; Your call <span class="tag-human">Human decides</span></div>
       <p class="council-lede">You've seen the architect's proposal and the council's review. Approve to move forward, or send it back for revision.</p>

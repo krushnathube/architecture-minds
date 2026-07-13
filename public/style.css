@@ -619,6 +619,41 @@ textarea::placeholder { color: var(--text-secondary); }
 }
 .btn-refine:hover { background: rgba(255,199,44,0.1); box-shadow: 0 0 20px var(--human-accent-glow); }
 
+.proposal-section {
+  margin-top: 36px;
+  padding-top: 32px;
+  border-top: 1px dashed var(--border);
+  animation: fadeIn 0.5s ease;
+}
+.proposal-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  margin: 16px 0 6px;
+}
+.proposal-hint { text-transform: none; letter-spacing: 0; color: var(--ai-accent); opacity: 0.85; }
+.proposal-input, .proposal-summary-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+  outline: none;
+}
+.proposal-input:focus, .proposal-summary-input:focus { border-color: var(--ai-accent); }
+.proposal-summary-input { resize: vertical; }
+.proposal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+.btn-polish { border-color: var(--ai-accent); color: var(--ai-accent); }
+.btn-polish:hover { background: rgba(138,205,71,0.1); }
+.btn-polish:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .decision-section {
   margin-top: 32px;
   padding-top: 28px;

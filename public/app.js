@@ -20,6 +20,12 @@ const decisionSection = document.getElementById('decisionSection');
 const refineBtn = document.getElementById('refineBtn');
 const exportPngBtn = document.getElementById('exportPngBtn');
 const steps = document.querySelectorAll('.step');
+const proposalSection = document.getElementById('proposalSection');
+const clientNameInput = document.getElementById('clientNameInput');
+const proposalSummaryText = document.getElementById('proposalSummaryText');
+const polishSummaryBtn = document.getElementById('polishSummaryBtn');
+const generateProposalBtn = document.getElementById('generateProposalBtn');
+const proposalStatus = document.getElementById('proposalStatus');
 
 let lastArchitecture = null;
 let lastCouncil = null;
@@ -124,6 +130,9 @@ async function generateArchitecture() {
   councilGrid.innerHTML = '';
   decisionSection.hidden = true;
   refineBtn.hidden = true;
+  proposalSection.hidden = true;
+  proposalSummaryText.value = '';
+  proposalStatus.textContent = '';
   generateBtn.disabled = true;
   originalRequirement = requirement;
   setStep(2);
@@ -462,6 +471,11 @@ function revealDecision(council) {
   const hasFlags = council.some(agent => agent.flags && agent.flags.length);
   refineBtn.hidden = !hasFlags;
 
+  proposalSection.hidden = false;
+  if (lastArchitecture && !proposalSummaryText.value) {
+    proposalSummaryText.value = `We recommend the following architecture: ${lastArchitecture.summary || ''}`;
+  }
+
   decisionSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
@@ -755,4 +769,212 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ---- Client Proposal: AI-polish (optional) + PDF generation ----
+polishSummaryBtn.addEventListener('click', async () => {
+  if (!lastArchitecture) return;
+
+  polishSummaryBtn.disabled = true;
+  const originalLabel = polishSummaryBtn.textContent;
+  polishSummaryBtn.textContent = 'Polishing…';
+  proposalStatus.textContent = '';
+  proposalStatus.style.color = 'var(--ai-accent)';
+
+  try {
+    const res = await fetch('/api/proposal-summary', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ architecture: lastArchitecture })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || 'Failed to polish summary.');
+    }
+
+    proposalSummaryText.value = data.summary;
+    proposalStatus.textContent = 'Summary polished. Feel free to edit further before downloading.';
+  } catch (err) {
+    console.error('Polish summary failed:', err);
+    proposalStatus.style.color = 'var(--error)';
+    proposalStatus.textContent = 'Could not polish the summary right now — your current text is still used as-is below.';
+  } finally {
+    polishSummaryBtn.disabled = false;
+    polishSummaryBtn.textContent = originalLabel;
+  }
+});
+
+generateProposalBtn.addEventListener('click', async () => {
+  if (!lastArchitecture) return;
+
+  generateProposalBtn.disabled = true;
+  const originalLabel = generateProposalBtn.textContent;
+  generateProposalBtn.textContent = 'Generating…';
+
+  try {
+    const diagramResult = await renderDiagramToDataUrl();
+    await buildProposalPdf(diagramResult);
+  } catch (err) {
+    console.error('Proposal generation failed:', err);
+  } finally {
+    generateProposalBtn.disabled = false;
+    generateProposalBtn.textContent = originalLabel;
+  }
+});
+
+async function buildProposalPdf(diagramResult) {
+  const diagramDataUrl = diagramResult.dataUrl;
+  const diagramAspect = diagramResult.height / diagramResult.width;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+
+  const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
+  const margin = 56;
+  const contentW = pageW - margin * 2;
+  let y = margin;
+
+  const NAVY = [15, 23, 41];
+  const GREEN = [110, 160, 60];
+  const AMBER = [190, 140, 20];
+  const GREY = [100, 110, 130];
+  const BLACK = [30, 34, 44];
+
+  function ensureSpace(neededHeight) {
+    if (y + neededHeight > pageH - margin) {
+      doc.addPage();
+      y = margin;
+    }
+  }
+
+  function heading(text, color) {
+    ensureSpace(28);
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(...color);
+    doc.text(text, margin, y);
+    y += 8;
+    doc.setDrawColor(...color);
+    doc.setLineWidth(1.2);
+    doc.line(margin, y, margin + 44, y);
+    y += 20;
+  }
+
+  function bodyText(text, opts = {}) {
+    doc.setFont('helvetica', opts.bold ? 'bold' : 'normal');
+    doc.setFontSize(opts.size || 11);
+    doc.setTextColor(...(opts.color || BLACK));
+    const lines = doc.splitTextToSize(text, opts.width || contentW);
+    lines.forEach(line => {
+      ensureSpace(opts.lineHeight || 15);
+      doc.text(line, margin, y);
+      y += opts.lineHeight || 15;
+    });
+    y += 8;
+  }
+
+  const clientName = (clientNameInput.value || '').trim() || 'Prospective Client';
+  const execSummary = (proposalSummaryText.value || '').trim() ||
+    `We recommend the following architecture: ${lastArchitecture.summary || ''}`;
+
+  // ---- Cover page ----
+  y = pageH / 2 - 100;
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(...GREEN);
+  doc.text('HAPPIEST MINDS TECHNOLOGIES', pageW / 2, y, { align: 'center' });
+  y += 40;
+
+  doc.setFontSize(26);
+  doc.setTextColor(...NAVY);
+  doc.text('Solution Proposal', pageW / 2, y, { align: 'center' });
+  y += 50;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(13);
+  doc.setTextColor(...BLACK);
+  doc.text(`Prepared for: ${clientName}`, pageW / 2, y, { align: 'center' });
+  y += 22;
+  doc.setFontSize(10.5);
+  doc.setTextColor(...GREY);
+  doc.text(new Date().toLocaleDateString(), pageW / 2, y, { align: 'center' });
+
+  // ---- Executive Summary ----
+  doc.addPage();
+  y = margin;
+  heading('Executive Summary', GREEN);
+  bodyText(execSummary, { size: 11.5 });
+
+  heading('Proposed Architecture', GREEN);
+  const imgW = contentW;
+  const imgH = imgW * diagramAspect;
+  ensureSpace(imgH + 10);
+  doc.addImage(diagramDataUrl, 'PNG', margin, y, imgW, imgH);
+  y += imgH + 24;
+
+  // ---- Recommendations (reframed AI notes, plain-language) ----
+  doc.addPage();
+  y = margin;
+  heading('Recommendations', GREEN);
+  const notes = lastArchitecture.considerations || [];
+  if (notes.length) {
+    notes.forEach(note => bodyText('\u2022 ' + note, { lineHeight: 14, size: 10.5 }));
+  } else {
+    bodyText('No specific recommendations flagged for this architecture.', { color: GREY });
+  }
+
+  // ---- Risk Overview (Council, summarized — verdicts only, not raw technical flags) ----
+  heading('Independent Review Summary', AMBER);
+  bodyText('This architecture was reviewed by three independent AI specialists covering cost, security, and reliability.', { color: GREY, size: 10 });
+  const agentColors = { cost: AMBER, security: [190, 60, 60], reliability: [90, 90, 170] };
+  if (lastCouncil && lastCouncil.length) {
+    lastCouncil.forEach(agent => {
+      ensureSpace(18);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...(agentColors[agent.id] || BLACK));
+      doc.text(`${agent.name} \u2014 ${(agent.severity || '').toUpperCase()} risk`, margin, y);
+      y += 15;
+      bodyText(agent.verdict || '', { size: 10 });
+    });
+  } else {
+    bodyText('Independent review pending at time of export.', { color: GREY });
+  }
+
+  // ---- Next Steps ----
+  heading('Next Steps', GREEN);
+  [
+    'Review this proposal with your technical and business stakeholders.',
+    'Schedule a solution walkthrough with our architecture team to validate assumptions.',
+    'Finalize scope, timeline, and commercial terms for implementation.'
+  ].forEach((step, i) => bodyText(`${i + 1}. ${step}`, { size: 11 }));
+
+  // ---- Technical Appendix ----
+  doc.addPage();
+  y = margin;
+  heading('Appendix: Terraform (AI-generated, technical reference)', GREY);
+  doc.setFont('courier', 'normal');
+  doc.setFontSize(8);
+  doc.setTextColor(...BLACK);
+  const tfLines = doc.splitTextToSize(lastArchitecture.terraform || '(none generated)', contentW);
+  tfLines.forEach(line => {
+    ensureSpace(11);
+    doc.text(line, margin, y);
+    y += 11;
+  });
+
+  // ---- Footer on every page ----
+  const pageCount = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    doc.setPage(i);
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...GREY);
+    doc.text(`Page ${i} of ${pageCount}`, pageW - margin - 50, pageH - 24);
+    doc.text('Powered by Happiest Minds', margin, pageH - 24);
+  }
+
+  const safeClient = clientName.slice(0, 30).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+  doc.save(`proposal-${safeClient || 'client'}.pdf`);
 }
