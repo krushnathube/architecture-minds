@@ -413,6 +413,7 @@ approveBtn.addEventListener('click', () => {
   reviewNote.className = 'review-note approved';
   reviewNote.textContent = '✓ Approved by engineer — this architecture is ready to move to implementation.';
   setStep(4);
+  logDecision('approved');
 });
 
 flagBtn.addEventListener('click', () => {
@@ -420,10 +421,12 @@ flagBtn.addEventListener('click', () => {
   reviewNote.className = 'review-note flagged';
   reviewNote.textContent = '⚑ Flagged for revision — use "Regenerate with Council feedback" below, or adjust the requirement above and try again.';
   setStep(4);
+  logDecision('flagged');
 });
 
 refineBtn.addEventListener('click', () => {
   if (!lastCouncil || !originalRequirement) return;
+  logDecision('sent-for-refinement');
 
   const allFlags = lastCouncil.flatMap(agent => agent.flags || []);
   if (!allFlags.length) return;
@@ -978,3 +981,100 @@ async function buildProposalPdf(diagramResult) {
   const safeClient = clientName.slice(0, 30).replace(/[^a-z0-9]+/gi, '-').toLowerCase();
   doc.save(`proposal-${safeClient || 'client'}.pdf`);
 }
+
+// ---- Session decision history (browser-local only — NOT a persistent audit trail) ----
+// This deliberately stores to localStorage rather than a server database. A real
+// multi-user, tamper-evident audit trail needs a backend database and auth, neither
+// of which exist in this app yet — that's tracked as a future item, not built here.
+const HISTORY_KEY = 'architectureMindsHistory';
+const HISTORY_MAX = 50;
+const historySection = document.getElementById('historySection');
+const historyList = document.getElementById('historyList');
+const downloadHistoryBtn = document.getElementById('downloadHistoryBtn');
+const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+function getHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch (e) {
+    return [];
+  }
+}
+
+function logDecision(decision) {
+  if (!lastArchitecture) return;
+  try {
+    const entry = {
+      timestamp: new Date().toISOString(),
+      requirement: originalRequirement || '',
+      summary: lastArchitecture.summary || '',
+      decision,
+      council: (lastCouncil || []).map(a => ({ name: a.name, severity: a.severity }))
+    };
+    const history = getHistory();
+    history.unshift(entry);
+    if (history.length > HISTORY_MAX) history.length = HISTORY_MAX;
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+    renderHistory();
+  } catch (e) {
+    console.error('Could not save decision to local history:', e);
+  }
+}
+
+function renderHistory() {
+  const history = getHistory();
+  if (!historySection) return;
+
+  if (!history.length) {
+    historySection.hidden = true;
+    return;
+  }
+
+  historySection.hidden = false;
+  historyList.innerHTML = '';
+
+  const decisionLabels = {
+    approved: { text: 'Approved', color: 'var(--hm-green)' },
+    flagged: { text: 'Flagged', color: 'var(--human-accent)' },
+    'sent-for-refinement': { text: 'Sent for refinement', color: 'var(--ai-accent)' }
+  };
+
+  history.forEach(entry => {
+    const row = document.createElement('div');
+    row.className = 'history-row';
+    const label = decisionLabels[entry.decision] || { text: entry.decision, color: 'var(--text-secondary)' };
+    const dt = new Date(entry.timestamp);
+    row.innerHTML = `
+      <div class="history-row-head">
+        <span class="history-decision" style="color:${label.color}">${escapeHtml(label.text)}</span>
+        <span class="history-time">${escapeHtml(dt.toLocaleString())}</span>
+      </div>
+      <div class="history-req">${escapeHtml(truncate(entry.requirement, 90))}</div>
+    `;
+    historyList.appendChild(row);
+  });
+}
+
+if (downloadHistoryBtn) {
+  downloadHistoryBtn.addEventListener('click', () => {
+    const history = getHistory();
+    const blob = new Blob([JSON.stringify(history, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'architecture-minds-session-history.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+
+if (clearHistoryBtn) {
+  clearHistoryBtn.addEventListener('click', () => {
+    localStorage.removeItem(HISTORY_KEY);
+    renderHistory();
+  });
+}
+
+renderHistory();

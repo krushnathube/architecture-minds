@@ -251,42 +251,222 @@
         <div class="usecase-title">Internal design review</div>
         <p class="usecase-text">Before a design goes to a formal review board, engineers get a fast, independent second opinion on cost, security, and reliability trade-offs.</p>
       </div>
-  </section>
-
-  <section class="roadmap-section">
-    <div class="section-kicker">What's next</div>
-    <h2 class="section-heading">This runs on AWS today. It's built to go further.</h2>
-    <p class="roadmap-lede">The Architect + Council pattern &mdash; propose, independently review, decide &mdash; isn't tied to one cloud or one kind of review. Here's where it's headed.</p>
-    <div class="roadmap-grid">
-      <div class="roadmap-card">
-        <div class="roadmap-head">
-          <span class="roadmap-title">Multi-cloud support</span>
-          <span class="roadmap-badge badge-next">Next up</span>
-        </div>
-        <p class="roadmap-text">Azure and GCP architectures, using the same Architect + Council pattern &mdash; so architects aren't locked into one cloud's playbook during client conversations.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">
-          <span class="roadmap-title">CI/CD pipeline integration</span>
-          <span class="roadmap-badge badge-next">Next up</span>
-        </div>
-        <p class="roadmap-text">Gate merges on Council risk scores, auto-attach AI-generated tests, and post the review straight onto the pull request &mdash; extending the same human-approval pattern into delivery.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">
-          <span class="roadmap-title">More specialists</span>
-          <span class="roadmap-badge badge-exploring">Exploring</span>
-        </div>
-        <p class="roadmap-text">A Compliance agent for regulated industries (BFSI, Healthcare) and a Performance agent for latency-sensitive systems &mdash; joining Cost, Security, and Reliability on the Council.</p>
-      </div>
-      <div class="roadmap-card">
-        <div class="roadmap-head">
-          <span class="roadmap-title">Proposal export</span>
-          <span class="roadmap-badge badge-exploring">Exploring</span>
-        </div>
-        <p class="roadmap-text">One click to turn an approved architecture, its Terraform, and the Council's review into a client-ready proposal document &mdash; closing the loop from conversation to deliverable.</p>
+      <div class="usecase-card" style="--uc-color: var(--hm-green);">
+        <div class="usecase-title">Onboarding new architects</div>
+        <p class="usecase-text">Junior architects explore AWS patterns interactively, seeing not just a proposed design but the reasoning three specialists apply to critique it.</p>
       </div>
     </div>
+  </section>
+
+  <section class="features-section">
+    <div class="section-kicker">Features</div>
+    <h2 class="section-heading">Everything this does today &mdash; and what's coming next.</h2>
+    <p class="roadmap-lede">Grouped by capability, not by timeline. Every item is tagged so it's clear what you can try right now versus what's still ahead.</p>
+
+    <div class="feature-category">
+      <div class="feature-category-title">Input &amp; Interaction</div>
+      <div class="feature-row">
+        <span class="feature-name">Voice input</span>
+        <span class="feature-desc">Speak a requirement using the browser's built-in speech recognition &mdash; no extra setup.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Typed fallback</span>
+        <span class="feature-desc">Always available alongside voice &mdash; important for noisy venues or unreliable mics.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Example prompts</span>
+        <span class="feature-desc">One-click starter requirements tuned to produce clean, reliable results.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+    </div>
+
+    <div class="feature-category">
+      <div class="feature-category-title">AI Architect</div>
+      <div class="feature-row">
+        <span class="feature-name">Architecture generation</span>
+        <span class="feature-desc">Plain-English requirement &rarr; AWS architecture diagram + Terraform, in one pass.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Auto-layout diagramming</span>
+        <span class="feature-desc">Nodes are ranked by actual data flow, not array order &mdash; clean left-to-right layout, no overlaps.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Enforced complexity limits</span>
+        <span class="feature-desc">Large or vague requirements degrade gracefully instead of silently oversimplifying.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Multi-cloud support</span>
+        <span class="feature-desc">Azure and GCP architectures using the same Architect + Council pattern.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+    </div>
+
+    <div class="feature-category">
+      <div class="feature-category-title">AI Council &mdash; Governance &amp; Review</div>
+      <div class="feature-row">
+        <span class="feature-name">Three specialist agents</span>
+        <span class="feature-desc">Cost, Security, and Reliability review the same proposal independently, in parallel.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Severity &amp; disagreement surfaced</span>
+        <span class="feature-desc">Specialists can genuinely conflict &mdash; that tension is shown, not hidden.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">More specialists</span>
+        <span class="feature-desc">Compliance (BFSI, Healthcare) and Performance agents joining the Council.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Private/local model option</span>
+        <span class="feature-desc">For compliance-sensitive clients whose data can't leave the network.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+    </div>
+
+    <div class="feature-category">
+      <div class="feature-category-title">Human Decision &amp; Iteration</div>
+      <div class="feature-row">
+        <span class="feature-name">Gated decision</span>
+        <span class="feature-desc">Approve / Flag only unlock after the Council finishes &mdash; no approving blind.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Regenerate with Council feedback</span>
+        <span class="feature-desc">Sends the specialists' concerns back into a fresh Architect pass &mdash; propose, critique, revise, decide.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">CI/CD pipeline integration</span>
+        <span class="feature-desc">Council risk scores gating merges, extending the same pattern into delivery.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+    </div>
+
+    <div class="feature-category">
+      <div class="feature-category-title">Exports &amp; Deliverables</div>
+      <div class="feature-row">
+        <span class="feature-name">Diagram PNG export</span>
+        <span class="feature-desc">A real image file for pasting into docs or slides &mdash; not a text/SVG copy-paste dump.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Full technical PDF report</span>
+        <span class="feature-desc">Requirement, diagram, Terraform, AI notes, Council review, and decision status &mdash; one file.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Client-facing proposal PDF</span>
+        <span class="feature-desc">Cover page, editable executive summary (with optional AI polish), recommendations, risk summary, next steps, technical appendix.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Printable booth poster</span>
+        <span class="feature-desc">A3 poster generator matching the site's visual identity, with a QR code to the live demo.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Deeper proposal automation</span>
+        <span class="feature-desc">Effort estimation, SOW templates, and pricing guardrails built into the proposal.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+    </div>
+
+    <div class="feature-category">
+      <div class="feature-category-title">Transparency &amp; Trust</div>
+      <div class="feature-row">
+        <span class="feature-name">Session decision history</span>
+        <span class="feature-desc">Every Approve/Flag/Refine logged locally in-browser, downloadable as JSON.</span>
+        <span class="feature-status status-live">Live</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Token usage &amp; cost transparency</span>
+        <span class="feature-desc">Real per-generation numbers, not estimates.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Persistent, multi-user audit trail</span>
+        <span class="feature-desc">Today's history is local to one browser &mdash; this needs a backend database.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-name">Usage analytics dashboard</span>
+        <span class="feature-desc">Generation counts, approval rates, and cost trends for leadership visibility.</span>
+        <span class="feature-status status-planned">Planned</span>
+      </div>
+    </div>
+
+  </section>
+
+  <section class="vision-section">
+    <div class="section-kicker">Vision</div>
+    <h2 class="section-heading">Where this is headed &mdash; not just what's built today.</h2>
+    <p class="roadmap-lede">This booth demo is the first slice of a bigger idea: AI that proposes, a council that reviews, and a human who always makes the call &mdash; applied everywhere Happiest Minds scopes and delivers solutions.</p>
+
+    <div class="horizon-grid">
+
+      <div class="horizon-block">
+        <div class="horizon-head">
+          <span class="horizon-year">Next 6&ndash;12 months</span>
+          <span class="roadmap-badge badge-next">Concrete</span>
+        </div>
+        <div class="horizon-title">Sharpening what exists</div>
+        <ul class="horizon-list">
+          <li>Token usage &amp; cost shown per generation &mdash; real numbers, not estimates</li>
+          <li>Enforced complexity limits, so large requirements degrade gracefully instead of silently oversimplifying</li>
+          <li>CI/CD pipeline integration &mdash; Council risk scores gating merges</li>
+          <li>Multi-cloud support (Azure, GCP) using the same Architect + Council pattern</li>
+        </ul>
+      </div>
+
+      <div class="horizon-block">
+        <div class="horizon-head">
+          <span class="horizon-year">2&ndash;5 years</span>
+          <span class="roadmap-badge badge-exploring">Direction</span>
+        </div>
+        <div class="horizon-title">Widening the Council</div>
+        <ul class="horizon-list">
+          <li>More specialists &mdash; Compliance (BFSI, Healthcare), Performance, matched to client industry</li>
+          <li>A private/local model option for compliance-sensitive clients whose data can't leave the network</li>
+          <li>Deeper proposal automation &mdash; effort estimation, SOW templates, pricing guardrails</li>
+          <li>Embedded into the tools architects already use daily (Teams, Slack, ticketing) &mdash; not a separate site</li>
+          <li>Persistent, multi-user audit trail (today's decision history is local to one browser) &mdash; needs a backend database</li>
+          <li>Usage analytics dashboard for leadership &mdash; generation counts, approval rates, token cost trends over time</li>
+        </ul>
+      </div>
+
+      <div class="horizon-block">
+        <div class="horizon-head">
+          <span class="horizon-year">5&ndash;10 years</span>
+          <span class="roadmap-badge badge-vision">Vision</span>
+        </div>
+        <div class="horizon-title">A pattern, not a product</div>
+        <ul class="horizon-list">
+          <li>Architect + Council + Human becomes a reusable foundation across Happiest Minds' other AI initiatives &mdash; any high-stakes AI decision that deserves independent review before a human signs off</li>
+          <li>The goal: this is how Happiest Minds scopes, builds, and governs AI-assisted delivery &mdash; a standard practice, not a standalone demo</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <p class="horizon-caveat">The 6&ndash;12 month items are concrete next steps we'd build first. The 2&ndash;10 year items are direction, not a committed roadmap &mdash; included so it's clear what kind of company decision this points toward, not because it's already decided.</p>
+  </section>
+
+  <section class="history-section" id="historySection" hidden>
+    <div class="section-kicker">Session history</div>
+    <h2 class="section-heading">Every decision made in this browser, this session.</h2>
+    <p class="roadmap-lede">Stored locally on this device only &mdash; not a persistent, multi-user audit trail. A real compliance-grade audit trail would need a backend database, which is on the 2&ndash;5 year horizon above, not built yet.</p>
+    <div class="history-actions">
+      <button class="btn btn-export" id="downloadHistoryBtn">&#8681; Download history (JSON)</button>
+      <button class="btn btn-flag" id="clearHistoryBtn">Clear history</button>
+    </div>
+    <div class="history-list" id="historyList"></div>
   </section>
 
 </main>
