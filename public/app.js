@@ -3,6 +3,7 @@ const micBtn = document.getElementById('micBtn');
 const micLabel = document.getElementById('micLabel');
 const generateBtn = document.getElementById('generateBtn');
 const statusLine = document.getElementById('statusLine');
+const architectProgress = document.getElementById('architectProgress');
 const resultPanel = document.getElementById('resultPanel');
 const errorPanel = document.getElementById('errorPanel');
 const errorText = document.getElementById('errorText');
@@ -136,7 +137,9 @@ async function generateArchitecture() {
   generateBtn.disabled = true;
   originalRequirement = requirement;
   setStep(2);
-  setStatus('AI agent is reasoning through the architecture…', false, true);
+  setStatus('', false, false);
+
+  const architectTimer = startArchitectProgress();
 
   try {
     const res = await fetch('/api/architect', {
@@ -146,6 +149,7 @@ async function generateArchitecture() {
     });
 
     const data = await res.json();
+    stopArchitectProgress(architectTimer, /* success */ res.ok);
 
     if (!res.ok) {
       throw new Error(data.error || 'Something went wrong.');
@@ -158,10 +162,47 @@ async function generateArchitecture() {
     convenCouncil(data);
   } catch (err) {
     console.error(err);
+    stopArchitectProgress(architectTimer, false);
     showError(err.message || 'Failed to generate architecture. Please try again.');
     setStatus('', false, false);
   } finally {
     generateBtn.disabled = false;
+  }
+}
+
+// ---- Architect progress panel: the real fetch is a single opaque network call with no
+// sub-progress signal, so these stages are a timed simulation of the known sub-steps —
+// capped so it never claims "done" before the real response arrives, and never freezes
+// if the response takes longer than the simulated stages (it holds, pulsing, on the last one). ----
+const architectStageEls = () => [...architectProgress.querySelectorAll('.progress-step')];
+
+function startArchitectProgress() {
+  const steps = architectStageEls();
+  steps.forEach(s => s.classList.remove('active', 'done'));
+  architectProgress.hidden = false;
+
+  let current = 0;
+  steps[0].classList.add('active');
+
+  const interval = setInterval(() => {
+    if (current >= steps.length - 1) return; // hold on the last stage until the real response arrives
+    steps[current].classList.remove('active');
+    steps[current].classList.add('done');
+    current++;
+    steps[current].classList.add('active');
+  }, 900);
+
+  return interval;
+}
+
+function stopArchitectProgress(interval, success) {
+  clearInterval(interval);
+  const steps = architectStageEls();
+  if (success) {
+    steps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+    setTimeout(() => { architectProgress.hidden = true; }, 400);
+  } else {
+    architectProgress.hidden = true;
   }
 }
 
@@ -438,6 +479,8 @@ refineBtn.addEventListener('click', () => {
 
 // ---- AI Architecture Council ----
 async function convenCouncil(architecture) {
+  const agentSteps = [...councilLoading.querySelectorAll('.progress-step')];
+  agentSteps.forEach(s => { s.classList.remove('done'); s.classList.add('active'); });
   councilLoading.hidden = false;
 
   try {
@@ -448,7 +491,10 @@ async function convenCouncil(architecture) {
     });
 
     const data = await res.json();
-    councilLoading.hidden = true;
+    agentSteps.forEach((s, i) => {
+      setTimeout(() => { s.classList.remove('active'); s.classList.add('done'); }, i * 150);
+    });
+    setTimeout(() => { councilLoading.hidden = true; }, agentSteps.length * 150 + 300);
 
     if (!res.ok) {
       console.error('Council error:', data.error);

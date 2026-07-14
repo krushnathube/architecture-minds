@@ -63,6 +63,26 @@
     </div>
 
     <div id="statusLine" class="status-line"></div>
+
+    <div class="progress-panel" id="architectProgress" hidden>
+      <div class="progress-panel-label">Architect agent</div>
+      <div class="progress-step" data-stage="0">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Parsing your requirement</span>
+      </div>
+      <div class="progress-step" data-stage="1">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Selecting AWS services</span>
+      </div>
+      <div class="progress-step" data-stage="2">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Designing the architecture</span>
+      </div>
+      <div class="progress-step" data-stage="3">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Drafting Terraform</span>
+      </div>
+    </div>
   </section>
 
   <section class="result-panel" id="resultPanel" hidden>
@@ -94,11 +114,19 @@
       </div>
     </div>
 
-    <div class="council-loading" id="councilLoading" hidden>
-      <div class="council-loading-row">
-        <span class="council-dot dot-cost"></span> Cost Agent reviewing&hellip;
-        <span class="council-dot dot-security"></span> Security Agent reviewing&hellip;
-        <span class="council-dot dot-reliability"></span> Reliability Agent reviewing&hellip;
+    <div class="progress-panel" id="councilLoading" hidden>
+      <div class="progress-panel-label">AI Architecture Council <span class="progress-panel-hint">&mdash; reviewing in parallel</span></div>
+      <div class="progress-step agent-cost" data-agent="cost">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Cost Agent reviewing&hellip;</span>
+      </div>
+      <div class="progress-step agent-security" data-agent="security">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Security Agent reviewing&hellip;</span>
+      </div>
+      <div class="progress-step agent-reliability" data-agent="reliability">
+        <span class="progress-icon"></span>
+        <span class="progress-label">Reliability Agent reviewing&hellip;</span>
       </div>
     </div>
 
